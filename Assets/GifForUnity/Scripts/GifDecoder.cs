@@ -73,18 +73,18 @@ namespace GifForUnity
 
         #region CurrentImageData
 
-        private int _imageLeft; // ¸ÃÖ¡Í¼Ïñ»æÖÆÆğµãµÄ×óÖµ£¨x£©
-        private int _imageTop; // ¸ÃÖ¡Í¼Ïñ»æÖÆÆğµãµÄ¶¥Öµ£¨y£©
-        private int _imageWidth; // ¸ÃÖ¡Í¼Ïñ»æÖÆµÄ¿í¶È
-        private int _imageHeight; // ¸ÃÖ¡Í¼Ïñ»æÖÆµÄ¸ß¶È
+        private int _imageLeft; // è¯¥å¸§å›¾åƒç»˜åˆ¶èµ·ç‚¹çš„å·¦å€¼ï¼ˆxï¼‰
+        private int _imageTop; // è¯¥å¸§å›¾åƒç»˜åˆ¶èµ·ç‚¹çš„é¡¶å€¼ï¼ˆyï¼‰
+        private int _imageWidth; // è¯¥å¸§å›¾åƒç»˜åˆ¶çš„å®½åº¦
+        private int _imageHeight; // è¯¥å¸§å›¾åƒç»˜åˆ¶çš„é«˜åº¦
 
         #endregion
 
         #region Data for LZWDecompress
 
-        private int[] _indices = new int[4096]; // ±àÒë±í £¬´æ´¢ÁËÊµ¼ÊcodeÔÚcodesÖĞµÄÏÂ±ê
-        private ushort[] _codes = new ushort[128 * 1024]; // ÑÕÉ«±í£¬´æ´¢Êµ¼ÊµÄcode
-        private uint[] _curBlock = new uint[64]; // µ±Ç°Image sub block µÄÊı¾İ ×î¶à 256/4
+        private int[] _indices = new int[4096]; // ç¼–è¯‘è¡¨ ï¼Œå­˜å‚¨äº†å®é™…codeåœ¨codesä¸­çš„ä¸‹æ ‡
+        private ushort[] _codes = new ushort[128 * 1024]; // é¢œè‰²è¡¨ï¼Œå­˜å‚¨å®é™…çš„code
+        private uint[] _curBlock = new uint[64]; // å½“å‰Image sub block çš„æ•°æ® æœ€å¤š 256/4
 
         #endregion
 
@@ -288,26 +288,26 @@ namespace GifForUnity
 
         private void LZWDecompress(Color32[] colorTable,int width,int height)
         {
-            // Í¼ÏñÊı¾İÊ¹ÓÃÒ»Î¬Êı×é´æ´¢
-            int row = (height - _imageTop - 1) * width;// yÖµ£¬gif´Ó×óÉÏ½Ç¿ªÊ¼£¬unity texture2d´Ó×óÏÂ½Ç¿ªÊ¼
-            int col = _imageLeft; // x µÄ ×îĞ¡Öµ
-            int rightEdge = _imageLeft + _imageWidth; // xµÄ×î´óÖµ
+            // å›¾åƒæ•°æ®ä½¿ç”¨ä¸€ç»´æ•°ç»„å­˜å‚¨
+            int row = (height - _imageTop - 1) * width;// yå€¼ï¼Œgifä»å·¦ä¸Šè§’å¼€å§‹ï¼Œunity texture2dä»å·¦ä¸‹è§’å¼€å§‹
+            int col = _imageLeft; //x çš„ æœ€å°å€¼
+            int rightEdge = _imageLeft + _imageWidth; // xçš„æœ€å¤§å€¼
             //Debug.LogError(col + "   " + rightEdge + "   " + (height - _imageTop));
-            int minTableSize = gifData[_byteIndex++]; // ×îĞ¡/ÆğÊ¼ ÑÕÉ«³¤¶È(µ¥Î»Îªbit)£¬¸ÃÖµ·¶Î§Îª2-8
+            int minTableSize = gifData[_byteIndex++]; // æœ€å°/èµ·å§‹ é¢œè‰²é•¿åº¦(å•ä½ä¸ºbit)ï¼Œè¯¥å€¼èŒƒå›´ä¸º2-8
             //if (minTableSize > 11)
             //    minTableSize = 11;
 
-            // ³õÊ¼»¯±àÒë±í
+            // åˆå§‹åŒ–ç¼–è¯‘è¡¨
 
-            int codeSize = minTableSize + 1;// µ¥¸öÊı×ÖµÄ³õÊ¼µÄ±àÂë³¤¶È£¬×î³¤²»³¬¹ı12Î»
-            int nextSize = Pow2[codeSize];// ÏÂÒ»´Î±àÒë±íÀ©ÈİÊ±µÄ×î´óÈİÁ¿
-            int maxCodesLength = Pow2[minTableSize];// µ±Ç°±àÒë±íÖĞµÄ×î´óÈİÁ¿£¨²»¼ÆÏÂÃæÁ½¸ö£©
-            int clearCode = maxCodesLength;// Çå³ı±ê¼Ç
-            int endCode = maxCodesLength + 1;// ½áÊø±ê¼Ç
+            int codeSize = minTableSize + 1;// å•ä¸ªæ•°å­—çš„åˆå§‹çš„ç¼–ç é•¿åº¦ï¼Œæœ€é•¿ä¸è¶…è¿‡12ä½
+            int nextSize = Pow2[codeSize];// ä¸‹ä¸€æ¬¡ç¼–è¯‘è¡¨æ‰©å®¹æ—¶çš„æœ€å¤§å®¹é‡
+            int maxCodesLength = Pow2[minTableSize];// å½“å‰ç¼–è¯‘è¡¨ä¸­çš„æœ€å¤§å®¹é‡ï¼ˆä¸è®¡ä¸‹é¢ä¸¤ä¸ªï¼‰
+            int clearCode = maxCodesLength;// æ¸…é™¤æ ‡è®°
+            int endCode = maxCodesLength + 1;// ç»“æŸæ ‡è®°
             //Debug.Log("endCode:" + endCode);
 
-            int codesEnd = 0;// Êµ¼ÊcodeµÄindex
-            int codesNum = maxCodesLength + 2;// ±àÒë±í³¤¶È
+            int codesEnd = 0;// å®é™…codeçš„index
+            int codesNum = maxCodesLength + 2;// ç¼–è¯‘è¡¨é•¿åº¦
             //Debug.Log("Start:" + codesNum);
             //Dictionary<uint, int[]> _dic = new Dictionary<uint, int[]>();
             //for (uint i = 0; i < maxCodesLength; i++)
@@ -318,41 +318,41 @@ namespace GifForUnity
             for (ushort i = 0; i < codesNum; i++)
             {
                 _indices[i] = codesEnd;
-                _codes[codesEnd++] = 1;// Ö®ºó¸ú×ÅµÄcode¸öÊı
+                _codes[codesEnd++] = 1;// ä¹‹åè·Ÿç€çš„codeä¸ªæ•°
                 _codes[codesEnd++] = i;// code
             }
             //Debug.Log("_codes end:"+codesEnd+"    " + _codes[codesEnd-1]);
-            //LZW½âÑ¹Ëõ loop
+            //LZWè§£å‹ç¼© loop
 
-            uint previousCode = NoCode;// Ç°×º
-            // tip: gif´æ´¢ÑÕÉ«Êı×ÖÊ±²ÉÓÃ¿É±ä±àÂë£¨¼´ÉáÆú¸ßÎ»ÎŞÓÃµÄ0£©£¬
-            uint mask = (uint)(nextSize - 1);//ÓÃÓÚÌáÈ¡Êı×Ö£¬´ÓµÍÎ»¿ªÊ¼
-            uint shiftRegister = 0;//ÒÆÎ»»º´æÆ÷
+            uint previousCode = NoCode;// å‰ç¼€
+            // tip: gifå­˜å‚¨é¢œè‰²æ•°å­—æ—¶é‡‡ç”¨å¯å˜ç¼–ç ï¼ˆå³èˆå¼ƒé«˜ä½æ— ç”¨çš„0ï¼‰ï¼Œ
+            uint mask = (uint)(nextSize - 1);//ç”¨äºæå–æ•°å­—ï¼Œä»ä½ä½å¼€å§‹
+            uint shiftRegister = 0;//ç§»ä½ç¼“å­˜å™¨
 
-            int bitsAvailable = 0;// µ±Ç°ÔÚÒÆÎ»»º´æÆ÷¿É¶ÁÈ¡µÄbitÊı
-            int bytesAvailable = 0;// µ±Ç°Image sub blockÖĞÊ£ÓàµÄbyteÊı
+            int bitsAvailable = 0;// å½“å‰åœ¨ç§»ä½ç¼“å­˜å™¨å¯è¯»å–çš„bitæ•°
+            int bytesAvailable = 0;// å½“å‰Image sub blockä¸­å‰©ä½™çš„byteæ•°
 
             int blockPos = 0;
 
             while (true)
             {
-                // ¶ÁÈ¡Êı×Ö
+                // è¯»å–æ•°å­—
                 uint curCode = shiftRegister & mask;
 
                 if (bitsAvailable >= codeSize)
                 {
-                    // Èç¹ûÊ£ÓàµÄbits¿É¹©¶ÁÈ¡
+                    // å¦‚æœå‰©ä½™çš„bitså¯ä¾›è¯»å–
                     bitsAvailable -= codeSize;
                     shiftRegister >>= codeSize;
                 }
                 else
                 {
-                    // ·ñÔò£¬´ËÊ±curCodeÖĞ´æ´¢ÁËÊ£ÓàµÄbits£¨Êµ¼ÊÊı×ÖµÄ²¿·Öbits£©
+                    // å¦åˆ™ï¼Œæ­¤æ—¶curCodeä¸­å­˜å‚¨äº†å‰©ä½™çš„bitsï¼ˆå®é™…æ•°å­—çš„éƒ¨åˆ†bitsï¼‰
                     // reload shift register
 
 
                     // if start of new block
-                    // µ±Ç°×Ó¿éÒÑÓÃÍê£¬¶ÁÈ¡ÏÂÒ»¸ö×Ó¿é
+                    // å½“å‰å­å—å·²ç”¨å®Œï¼Œè¯»å–ä¸‹ä¸€ä¸ªå­å—
                     if (bytesAvailable <= 0)
                     {
                         // read blocksize
@@ -372,7 +372,7 @@ namespace GifForUnity
                     }
 
                     // load shift register
-                    // Ë¢ĞÂ»º´æÆ÷
+                    // åˆ·æ–°ç¼“å­˜å™¨
                     shiftRegister = _curBlock[blockPos++];
                     int newBits = bytesAvailable >= 4 ? 32 : bytesAvailable * 8;
                     bytesAvailable -= 4;
@@ -381,9 +381,9 @@ namespace GifForUnity
 
                     if (bitsAvailable > 0)
                     {
-                        // ¶ÁÈ¡Êı×ÖÊ±£¬¿ÉÄÜ»á¿çÔ½²»Í¬µÄImageSubBlock£¨¼´¿É¼òµ¥Àí½âÎªImageData³õÊ¼ÊÇÁ¬ĞøµÄÊı×ÖÁ÷£¬ÎªÇĞ³ÉÒ»¸ö¸ö×Ó¿é£¬
-                        // ÈËÎª²åÈëÁË×Ó¿éµÄ´óĞ¡£©
-                        // ÈôcurCodeÖĞÒÑ´æ´¢²¿·Öbits
+                        // è¯»å–æ•°å­—æ—¶ï¼Œå¯èƒ½ä¼šè·¨è¶Šä¸åŒçš„ImageSubBlockï¼ˆå³å¯ç®€å•ç†è§£ä¸ºImageDataåˆå§‹æ˜¯è¿ç»­çš„æ•°å­—æµï¼Œä¸ºåˆ‡æˆä¸€ä¸ªä¸ªå­å—ï¼Œ
+                        // äººä¸ºæ’å…¥äº†å­å—çš„å¤§å°ï¼‰
+                        // è‹¥curCodeä¸­å·²å­˜å‚¨éƒ¨åˆ†bits
                         var bitsRemaining = codeSize - bitsAvailable;
                         curCode |= (shiftRegister << bitsAvailable) & mask;
                         shiftRegister >>= bitsRemaining;
@@ -391,7 +391,7 @@ namespace GifForUnity
                     }
                     else
                     {
-                        // ´ËÊ±curCodeÎª0
+                        // æ­¤æ—¶curCodeä¸º0
                         curCode = shiftRegister & mask;
                         shiftRegister >>= codeSize;
                         bitsAvailable = newBits - codeSize;
@@ -422,7 +422,7 @@ namespace GifForUnity
                     break;
                 }
 
-                // ´¦ÀíÊı×Ö´óÖÂÁ÷³ÌÈçÏÂ
+                // å¤„ç†æ•°å­—å¤§è‡´æµç¨‹å¦‚ä¸‹
                 // let CODE be the next code in the code stream
                 // is CODE in the code table?
                 // Yes:
@@ -436,8 +436,8 @@ namespace GifForUnity
                 //     add { PREVCODE} +K to code table
                 //     set PREVCODE = CODE
 
-                // ±È½Ï¿ÉÖª£¬Á½ÖÖÇé¿öÏÂ£¬¾ùÒª½«{ PREVCODE} +K ÌîÈë±àÒë±í£¬Ö»ÊÇkµÄÀ´Ô´²»Í¬
-                // ¾ùÒªPREVCODE = CODE£¬²»Í¬µãÔÚÓÚ¡°Yes¡±Ê±Ö»Êä³ö{ CODE}µ½output£¬¶ø¡°No¡±Ê±£¬»¹Ğè½«kÊä³öµ½output
+                // æ¯”è¾ƒå¯çŸ¥ï¼Œä¸¤ç§æƒ…å†µä¸‹ï¼Œå‡è¦å°†{ PREVCODE} +K å¡«å…¥ç¼–è¯‘è¡¨ï¼Œåªæ˜¯kçš„æ¥æºä¸åŒ
+                // å‡è¦PREVCODE = CODEï¼Œä¸åŒç‚¹åœ¨äºâ€œYesâ€æ—¶åªè¾“å‡º{ CODE}åˆ°outputï¼Œè€Œâ€œNoâ€æ—¶ï¼Œè¿˜éœ€å°†kè¾“å‡ºåˆ°output
 
                 bool plusOne = false;
                 int codePos = 0;
@@ -451,7 +451,7 @@ namespace GifForUnity
                 {
                     // write previous code
                     codePos = _indices[previousCode];
-                    plusOne = true;//±ê¼ÇĞè½«kÊä³öµ½output
+                    plusOne = true;//æ ‡è®°éœ€å°†kè¾“å‡ºåˆ°output
                 }
                 else
                 {
@@ -636,16 +636,16 @@ namespace GifForUnity
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] // »ı¼«ÄÚÁª
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] // ç§¯æå†…è”
         private byte ReadByte()
         {
             return gifData[_byteIndex++];
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)] // »ı¼«ÄÚÁª
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] // ç§¯æå†…è”
         private ushort ReadUInt16()
         {
-            // gif Ä¬ÈÏĞ¡¶Ë£¬¼´Êı×ÖÒÔ´ÓµÍµ½¸ßÎ»´æ´¢
+            // gif é»˜è®¤å°ç«¯ï¼Œå³æ•°å­—ä»¥ä»ä½åˆ°é«˜ä½å­˜å‚¨
             return (ushort)(gifData[_byteIndex++] | gifData[_byteIndex++] << 8);
         }
 

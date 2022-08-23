@@ -8,6 +8,7 @@ using UnityEngine.UI;
 
 namespace GifForUnity111
 {
+    /*
     public class GifTexture
     {
         public Texture2D texture;
@@ -16,11 +17,11 @@ namespace GifForUnity111
 
     public class GifFormat
     {
-        // ÎÄ¼şÍ·
+        // æ–‡ä»¶å¤´
         public string Signature;
         public string Version;
 
-        // ÆÁÄ»ÃèÊö¿é
+        // å±å¹•æè¿°å—
         public ushort LogicalScreenWidth;
         public ushort LogicalScreenHeight;
         public bool GlobalColorTableFlag;
@@ -30,15 +31,15 @@ namespace GifForUnity111
         public byte BackgroundColorIndex;
         public byte PixelAspectRatio;
 
-        // È«¾Öµ÷É«ÅÌÊı¾İ
-        public List<byte[]> GlobalColorTables; // rgbÒ»×é
+        // å…¨å±€è°ƒè‰²ç›˜æ•°æ®
+        public List<byte[]> GlobalColorTables; // rgbä¸€ç»„
         public List<GifImageBlock> GifImageBlocks;
         public List<GifGraphicControlExtension> GifGraphicControlExtensions;
         public List<GifCommentExtension> GifCommentExtensions;
         public List<GifPlainTextExtension> GifPlainTextExtensions;
         public GifApplicationExtension GifApplicationExtension;
 
-        // ½áÊø·û
+        // ç»“æŸç¬¦
         public byte Trailer;
     }
 
@@ -137,13 +138,16 @@ namespace GifForUnity111
             public byte[] BlockDatas;
         }
     }
-
+    */
 
     public class GifPlayer : MonoBehaviour
     {
         public List<string> paths;
         public int select;
-        public RawImage ui;    
+        public RawImage ui;
+
+        public Texture2D Tex;
+
 
         private List<Texture2D> _texs = new List<Texture2D>();
         private int index = 0;
@@ -160,7 +164,7 @@ namespace GifForUnity111
             if (Input.GetKeyDown(KeyCode.A))
             {
                 if (index == _texs.Count) index = 0;
-                ui.texture = _texs[index++];
+                Tex = _texs[index++];
             }
         }
 
@@ -177,12 +181,45 @@ namespace GifForUnity111
             GifForUnity.GifDecoder decoder = new GifForUnity.GifDecoder(gifData);
             decoder.ProcessData();
 
-
-            //var gif = decoder.gifFormat.images;
-
             _texs = decoder.resultTexs;
+
+            var images = decoder.gifFormat.images;
+            Debug.Log("å›¾ç‰‡é•¿åº¦:" + images.Count);
+            GenerateBigTex1(images);
         }
 
+        private void GenerateBigTex1(List<GifForUnity.GifImage> images)
+        {
+            var count = images.Count;
+            long length = 0;
+            for (int i = 0; i < count; i++)
+            {
+                length += images[i].RawImage.LongLength;
+            }
+            Color32[] colors = new Color32[length];
+            long index = 0;
+            for (int i = 0; i < count; i++)
+            {
+                var image = images[i];
+                for (long j = 0; j < image.RawImage.LongLength; j++)
+                {
+                    colors[index] = image.RawImage[j];
+                    index++;
+                }
+            }
+
+            Tex = new Texture2D(images[0].Width, images[0].Height * count, TextureFormat.ARGB32, false)
+            {
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Clamp
+            };
+
+            Tex.SetPixels32(colors);
+            Tex.Apply();
+        }
+
+
+        /*
         private GifFormat SetGifData(byte[] gifData)
         {
             GifFormat gifFormat = new GifFormat();
@@ -367,7 +404,7 @@ namespace GifForUnity111
                 }
                 else if (dic.ContainsKey(key))
                 {
-                    // ´æÔÚÓÚ±àÒë±íÖĞ
+                    // å­˜åœ¨äºç¼–è¯‘è¡¨ä¸­
                     entry = dic[key];
                     //output[outputAddIndex] = entry;
                 }
@@ -770,6 +807,6 @@ namespace GifForUnity111
         {
 
         }
+*/
     }
-
 }
